@@ -5,9 +5,11 @@ import java.util.Scanner;
 class TreeNode {
     String name;
     List<TreeNode> children;
+    TreeNode parent;
 
-    TreeNode(String name) {
+    TreeNode(String name, TreeNode parent) {
         this.name = name;
+        this.parent = parent;
         this.children = new ArrayList<>();
     }
 
@@ -25,16 +27,16 @@ class TreeNode {
     }
 }
 
-public class TreeDemo{
+public class TreeDemo {
     private static TreeNode root;
     private static TreeNode currentNode;
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        root = new TreeNode("root");
+        root = new TreeNode("root", null);
         currentNode = root;
 
-        System.out.println("Welcome to the File System Simulator!");
+        System.out.println("Welcome to the TreeDemo Simulator!");
         printInstructions();
 
         while (true) {
@@ -42,7 +44,7 @@ public class TreeDemo{
             String command = scanner.nextLine();
 
             if (command.equalsIgnoreCase("exit")) {
-                System.out.println("Exiting File System Simulator. Goodbye!");
+                System.out.println("Exiting TreeDemo Simulator. Goodbye!");
                 break;
             }
 
@@ -62,17 +64,17 @@ public class TreeDemo{
     }
 
     private static void handleCommand(String command) {
-        String[] parts = command.split(" ");
+        String[] parts = command.split(" ", 2);
         switch (parts[0].toLowerCase()) {
             case "mkdir":
-                if (parts.length < 2) {
+                if (parts.length < 2 || parts[1].isBlank()) {
                     System.out.println("Usage: mkdir <name>");
                 } else {
                     createFolder(parts[1]);
                 }
                 break;
             case "cd":
-                if (parts.length < 2) {
+                if (parts.length < 2 || parts[1].isBlank()) {
                     System.out.println("Usage: cd <name>");
                 } else {
                     changeDirectory(parts[1]);
@@ -90,24 +92,24 @@ public class TreeDemo{
         if (currentNode.findChild(name) != null) {
             System.out.println("Folder already exists.");
         } else {
-            currentNode.addChild(new TreeNode(name));
+            currentNode.addChild(new TreeNode(name, currentNode));
             System.out.println("Folder '" + name + "' created.");
         }
     }
 
     private static void changeDirectory(String name) {
         if (name.equals("..")) {
-            if (currentNode == root) {
+            if (currentNode.parent == null) {
                 System.out.println("Already at the root directory.");
             } else {
-                currentNode = root;
-                System.out.println("Moved to root directory.");
+                currentNode = currentNode.parent;
+                System.out.println("Moved to folder: " + currentNode.name);
             }
         } else {
             TreeNode nextNode = currentNode.findChild(name);
             if (nextNode != null) {
                 currentNode = nextNode;
-               System.out.println("Moved to folder: " + name);
+                System.out.println("Moved to folder: " + name);
             } else {
                 System.out.println("Folder not found.");
             }
